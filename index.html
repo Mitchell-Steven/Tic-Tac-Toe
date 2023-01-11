@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section>
+        <h1>Tic-Tac-Toe</h1>
+        <button class="gameButton" onclick="cellClick('b0', 0)" id="b0"></button>
+        <button class="gameButton" onclick="cellClick('b1', 1)" id="b1"></button>
+        <button class="gameButton" onclick="cellClick('b2', 2)" id="b2"></button>
+        <br>
+        <button class="gameButton" onclick="cellClick('b3', 3)" id="b3"></button>
+        <button class="gameButton" onclick="cellClick('b4', 4)" id="b4"></button>
+        <button class="gameButton" onclick="cellClick('b5', 5)" id="b5"></button>
+        <br>
+        <button class="gameButton" onclick="cellClick('b6', 6)" id="b6"></button>
+        <button class="gameButton" onclick="cellClick('b7', 7)" id="b7"></button>
+        <button class="gameButton" onclick="cellClick('b8', 8)" id="b8"></button>
+    </section>
+    <section>
+        <br>
+        <h2 id="messageHeader" style="color: red"></h2>
+        <h3 id="replayHeader"></h3>
+        <button onclick="playAgain()">Play Again</button>
+    </section>
+<script src="script.js"></script>
+</body>
+</html>
