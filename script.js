@@ -55,6 +55,7 @@ function cellClick(id, id2) {
 function playAgain() {
     gameCells.forEach(element => {
         element.innerHTML = "";
+        element.style.backgroundColor=null;
     });
     document.getElementById("messageHeader").innerHTML = "";
     currentPlayer = "X";
@@ -66,9 +67,17 @@ function playAgain() {
 function gameStatus() {
     for(let i = 0; i < winCons.length; i++)
     {
-        if((playerSelections[winCons[i][0]] == currentPlayer) && (playerSelections[winCons[i][1]] == currentPlayer) && (playerSelections[winCons[i][2]] == currentPlayer))
+        if(playerSelections[winCons[i][0]] == currentPlayer && playerSelections[winCons[i][1]] == currentPlayer && playerSelections[winCons[i][2]] == currentPlayer)
         {
             document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`;
+            document.getElementById("b" + winCons[i][0]).style.backgroundColor="green";
+            document.getElementById("b" + winCons[i][1]).style.backgroundColor="green";
+            document.getElementById("b" + winCons[i][2]).style.backgroundColor="green";
+            gameOver = true;
+        }
+        else if(!playerSelections.includes("") && gameOver == false)
+        {
+            document.getElementById("messageHeader").innerHTML = "The game has ended in a draw. Would you like to play again?";
             gameOver = true;
         }
     }
