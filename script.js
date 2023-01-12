@@ -37,23 +37,51 @@ function cellClick(id, id2) {
     else if (currentPlayer == "X")
     {
         document.getElementById(id).innerHTML = "X";
+        gameCells.forEach(element => {
+            element.disabled = true;
+        });
         playerSelections[id2] = currentPlayer;
         document.getElementById("messageHeader").innerHTML = "";
-        gameStatus();
+        gameStatus(); //<- This is function iteration causing the issue
         currentPlayer = "O";
     }
-    else
+    
+    if (currentPlayer == "O")
     {
-        document.getElementById(id).innerHTML = "O";
-        playerSelections[id2] = currentPlayer;
-        document.getElementById("messageHeader").innerHTML = "";
-        gameStatus();
-        currentPlayer = "X";
+        let validPlay = false;
+        while (validPlay == false)
+        {
+            let ranNum = Math.floor(Math.random() * 9);
+            console.log(ranNum);
+            
+            if (document.getElementById("b" + ranNum).innerHTML == "" /*&& gameOver == false*/) //<- That doesn't work because gameOver is set to true when the winnig square is clicked
+            {
+                setTimeout(() => {document.getElementById("b" + ranNum).innerHTML = "O"}, 1000);
+                setTimeout(() => {gameCells.forEach(element => {
+                    element.disabled = false;
+                })}, 1000);
+                playerSelections[ranNum] = currentPlayer;
+                gameStatus();
+                if (gameOver != true){
+                    currentPlayer = "X"
+                }
+                validPlay = true;
+            }
+            else if (!playerSelections.includes(""))
+            {
+                break;
+            }
+            else
+            {
+                continue;
+            }
+        }
     }
 }
 
 function playAgain() {
     gameCells.forEach(element => {
+        element.disabled = false;
         element.innerHTML = "";
         element.style.backgroundColor=null;
     });
@@ -69,15 +97,32 @@ function gameStatus() {
     {
         if(playerSelections[winCons[i][0]] == currentPlayer && playerSelections[winCons[i][1]] == currentPlayer && playerSelections[winCons[i][2]] == currentPlayer)
         {
-            document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`;
-            document.getElementById("b" + winCons[i][0]).style.backgroundColor="green";
-            document.getElementById("b" + winCons[i][1]).style.backgroundColor="green";
-            document.getElementById("b" + winCons[i][2]).style.backgroundColor="green";
-            gameOver = true;
+            if (currentPlayer == "O") {
+                setTimeout(() => {document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`}, 1000);
+                setTimeout(() => {document.getElementById("b" + winCons[i][0]).style.backgroundColor="green"}, 1000);
+                setTimeout(() => {document.getElementById("b" + winCons[i][1]).style.backgroundColor="green"}, 1000);
+                setTimeout(() => {document.getElementById("b" + winCons[i][2]).style.backgroundColor="green"}, 1000);
+                gameOver = true;
+            }
+            else if (currentPlayer == "X") {
+                document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`;
+                document.getElementById("b" + winCons[i][0]).style.backgroundColor="green";
+                document.getElementById("b" + winCons[i][1]).style.backgroundColor="green";
+                document.getElementById("b" + winCons[i][2]).style.backgroundColor="green";
+                gameOver = true; //<- This is where gameOver is set to true, causing the problem with my while loop
+            }
+            
         }
         else if(!playerSelections.includes("") && gameOver == false)
         {
             document.getElementById("messageHeader").innerHTML = "The game has ended in a draw. Would you like to play again?";
+            document.getElementById("b0").style.backgroundColor = "orange";
+            document.getElementById("b1").style.backgroundColor = "orange";
+            document.getElementById("b2").style.backgroundColor = "orange";
+            document.getElementById("b3").style.backgroundColor = "orange";
+            document.getElementById("b6").style.backgroundColor = "orange";
+            document.getElementById("b7").style.backgroundColor = "orange";
+            document.getElementById("b8").style.backgroundColor = "orange";
             gameOver = true;
         }
     }
