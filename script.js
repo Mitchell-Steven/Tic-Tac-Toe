@@ -33,6 +33,7 @@ var gameOver = false;   //Boolean that will be used to determine whether or not 
 var difficulty = "";    //The difficulty the player has selected the game to be
 var ranNum = 0; //Will hold the randomly generated number the computer will use to determine where to place an O
 var validPlay = false;  //Determines if the computer has selected a valid space for play
+var numHolder;  //Temporary holder for the randomly generated number in hard mode
 
 disableButtons();
 
@@ -55,6 +56,7 @@ function cellClick(id, pSelect) {
     else if (document.getElementById(id).innerHTML == "X" || document.getElementById(id).innerHTML == "O")
     {
         document.getElementById("messageHeader").innerHTML = "Invalid Selection";
+        
     }
     else if (currentPlayer == "X")
     {
@@ -76,7 +78,7 @@ function cellClick(id, pSelect) {
      * Once a valid square is selected and the O is placed the player will be set to X and the loop will end
      */
     //Gameplay loop for when the user selects easy difficulty
-    if (currentPlayer == "O" && gameOver != true && difficulty == "easy")
+    if (currentPlayer == "O" && gameOver != true && difficulty == "easy" && document.getElementById("messageHeader").innerHTML == "")
     {
         validPlay = false;
 
@@ -104,7 +106,7 @@ function cellClick(id, pSelect) {
         }
     }
     //Gameplay loop for when the user selects normal difficulty
-    else if (currentPlayer == "O" && gameOver != true && difficulty == "normal")
+    else if (currentPlayer == "O" && gameOver != true && difficulty == "normal" && document.getElementById("messageHeader").innerHTML == "")
     {
         validPlay = false;
 
@@ -157,12 +159,13 @@ function cellClick(id, pSelect) {
         }
     }
     //Gameplay loop for when the user selects hard
-    else
+    else if (currentPlayer == "O" && gameOver != true && difficulty == "hard" && document.getElementById("messageHeader").innerHTML == "")
     {
         validPlay = false;
 
         while (validPlay == false)
         {
+            //Check if it's possible for the computer to win the game
             for (let i = 0; i < winCons.length; i++)
             {
                 if (playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][1]] == "O" && playerSelections[winCons[i][2]] == "O" || playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][2]] == "O")
@@ -176,6 +179,7 @@ function cellClick(id, pSelect) {
                         }
                     }
                 }
+                //Check if it's possible to block the player from winning the game
                 else if (playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][1]] == "X" && playerSelections[winCons[i][2]] == "X" || playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][2]] == "X")
                 {
 
@@ -188,32 +192,39 @@ function cellClick(id, pSelect) {
                         }
                     }
                 }
+                //Looks for rows already containing an O and randomly selects a square from one of those rows to attempt to make a line
+                /**
+                 * WHY IS THIS SO BROKEN?!?!?!?!?!?!?!?!?
+                 */
                 else
                 {
-                    if (playerSelections[winCons[i][0]] == "O" || playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][2]] == "O")
+                    if (playerSelections[winCons[i][0]] == "X" || playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][2]] == "X")
                     {
-                        if (playerSelections[winCons[i][0]] == "X" || playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][2]] == "X")
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            console.log("I got here!!!");
-
-                            if (playerSelections[winCons[i][0]] == "") {availableCells.push(playerSelections[winCons[i][0]])}
-
-                            if (playerSelections[winCons[i][1] == ""]) {availableCells.push(playerSelections[winCons[i][1]])}
-
-                            if (playerSelections[winCons[i][2]] == "") {availableCells.push(playerSelections[winCons[i][2]])}
-                        }
+                        console.log("I have checked " + winCons[i] + " and skipped")
+                        continue;
                     }
-                }
+                    else if (playerSelections[winCons[i][0]] == "O" || playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][2]] == "O")
+                    {
+                        if (playerSelections[winCons[i][0]] == "") {availableCells.push(winCons[i][0])}
 
-                console.log(availableCells);
+                        if (playerSelections[winCons[i][1]] == "") {availableCells.push(winCons[i][1])}
+
+                        if (playerSelections[winCons[i][2]] == "") {availableCells.push(winCons[i][2])}
+
+                        numHolder = Math.floor(Math.random() * (availableCells.length + 1));
+                        ranNum = availableCells[numHolder];
+
+                        console.log("I have checked " + winCons[i] + " and gotten " + availableCells + " and " + ranNum);
+                    }
+                    else if (availableCells.length == 0)
+                    {
+                        ranNum = Math.floor(Math.random() * 9);
+                    }
+                }   
             }
 
-            ranNum = Math.floor(Math.random() * availableCells.length + 1);
-            console.log(ranNum);
+            //while (availableCells.length > 0) {availableCells.pop()}
+            //console.log(ranNum);
 
             if (document.getElementById("b" + ranNum).innerHTML == "")
             {
@@ -231,6 +242,7 @@ function cellClick(id, pSelect) {
                 continue;
             }
         }
+        //console.log(availableCells);
     }
 }
 
