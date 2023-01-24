@@ -1,6 +1,7 @@
 /**
  * Array Variables
  */
+
 //Array representing the cells on the board
 const gameCells = [
     document.getElementById("b0"),
@@ -25,30 +26,22 @@ const winCons = [
     [2, 4, 6]
 ]
 var playerSelections = ["", "", "", "", "", "", "", "", ""] //Array that holds all cell selections made by the player and the computer
-var availableCells = [] //Array of cells available for the computer to place an O to attempt a win
+var aiPlays = [];                                           //Used to determine which cells the ai will play in
 
 //Standard variables
 var currentPlayer = "X";    //Variable representing the current player (will be changed after each selection a player makes)
-var gameOver = false;   //Boolean that will be used to determine whether or not the game has ended
-var difficulty = "";    //The difficulty the player has selected the game to be
-var ranNum = 0; //Will hold the randomly generated number the computer will use to determine where to place an O
-var validPlay = false;  //Determines if the computer has selected a valid space for play
-var numHolder;  //Temporary holder for the randomly generated number in hard mode
+var gameOver = false;       //Boolean that will be used to determine whether or not the game has ended
+var difficulty;             //The difficulty the player has selected the game to be
+var ranNum = 0;             //Will hold the randomly generated number the computer will use to determine where to place an O
 
 disableButtons();
 
 /**
- * THIS FUNCTION IS FOR THE ACTUAL GAME LOOP
+ * Runs each time a cell on the board is clicked by the user
+ * @param {*} id        The ID of the cell being selected by the player
+ * @param {*} pSelect   The number of the cell being selected by the player
  */
-
-//Parameters are the id of the buttons the function is being used for and the indices of the playerSelection array
 function cellClick(id, pSelect) {
-    /**
-     * Tells the player to select play again if the game has ended and they attempt to click another cell
-     * Gives the player an error if they attempt to click a cell that already contains an X or an O
-     * If the player selects a valid cell an X is placed and all cells are disabled until computer completes its turn
-     * The player choice is placed into the playerSelection array, the error message is cleared if there is one, the status of the game is checked and the player is set to O
-     */
     if(gameOver == true)
     {
         document.getElementById("replayHeader").innerHTML = "Please select play again if you would like another try.";
@@ -56,8 +49,11 @@ function cellClick(id, pSelect) {
     else if (document.getElementById(id).innerHTML == "X" || document.getElementById(id).innerHTML == "O")
     {
         document.getElementById("messageHeader").innerHTML = "Invalid Selection";
-        
     }
+    /**
+     * Sets the cell text to X, disables all the buttons on the board, assigns X to the playerSelection array
+     * Resets the message header, checks the status of the game, sets current player to O and runs the logic of the game based on the difficulty
+     */
     else if (currentPlayer == "X")
     {
         document.getElementById(id).innerHTML = "X";
@@ -66,202 +62,24 @@ function cellClick(id, pSelect) {
         document.getElementById("messageHeader").innerHTML = "";
         gameStatus();
         currentPlayer = "O";
-    }
-    
-    /**
-     * If loop runs if it's time for the AI to make a move and the game has not yet ended
-     * For loop contains 2 if statement. The first checks if it is possible for the computer to win and places accordingly and the second checks if it is possible to block the
-     * player from winning and places accordingly
-     * If neither if loop is triggered the computer will select a random square on the board and place an O there after a 1 second pause,
-     * provided the square selected does not already contain and X or an O
-     * If a square already containing an X or an O is selected the loop will be run again with a different randomly selected square until a valid choice is found
-     * Once a valid square is selected and the O is placed the player will be set to X and the loop will end
-     */
-    //Gameplay loop for when the user selects easy difficulty
-    if (currentPlayer == "O" && gameOver != true && difficulty == "easy" && document.getElementById("messageHeader").innerHTML == "")
-    {
-        validPlay = false;
-
-        while (validPlay == false)
-        {
-            ranNum = Math.floor(Math.random() * 9);
-
-            if (document.getElementById("b" + ranNum).innerHTML == "")
-            {
-                //console.log("I got here");
-                setTimeout(() => {if(currentPlayer == "O"){document.getElementById("b" + ranNum).innerHTML = "O"}}, 1000);
-                setTimeout(() => {enableButtons()}, 1000);
-                playerSelections[ranNum] = currentPlayer; 
-                gameStatus();
-                if (gameOver != true){
-                    setTimeout(() => {currentPlayer = "X"}, 1000);
-                }
-                validPlay = true;
-            }
-            else
-            {
-                //console.log("I did it");
-                continue;
-            }
-        }
-    }
-    //Gameplay loop for when the user selects normal difficulty
-    else if (currentPlayer == "O" && gameOver != true && difficulty == "normal" && document.getElementById("messageHeader").innerHTML == "")
-    {
-        validPlay = false;
-
-        while (validPlay == false)
-        {
-            ranNum = Math.floor(Math.random() * 9);
-            
-            for (let i = 0; i < winCons.length; i++)
-            {
-                if (playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][1]] == "O" && playerSelections[winCons[i][2]] == "O" || playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][2]] == "O")
-                {
-                    for (let c = 0; c < winCons[i].length; c++)
-                    {
-                        if (playerSelections[winCons[i][c]] == "")
-                        {
-                            ranNum = winCons[i][c];
-                            break;
-                        }
-                    }
-                }
-                else if (playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][1]] == "X" && playerSelections[winCons[i][2]] == "X" || playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][2]] == "X")
-                {
-
-                    for (let d = 0; d < winCons[i].length; d++)
-                    {
-                        if (playerSelections[winCons[i][d]] == "")
-                        {
-                            ranNum = winCons[i][d];
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (document.getElementById("b" + ranNum).innerHTML == "")
-            {
-                setTimeout(() => {if(currentPlayer == "O"){document.getElementById("b" + ranNum).innerHTML = "O"}}, 1000);
-                setTimeout(() => {enableButtons()}, 1000);
-                playerSelections[ranNum] = currentPlayer; 
-                gameStatus();
-                if (gameOver != true){
-                    setTimeout(() => {currentPlayer = "X"}, 1000);
-                }
-                validPlay = true;
-            }
-            else
-            {
-                continue;
-            }
-        }
-    }
-    //Gameplay loop for when the user selects hard
-    else if (currentPlayer == "O" && gameOver != true && difficulty == "hard" && document.getElementById("messageHeader").innerHTML == "")
-    {
-        validPlay = false;
-
-        while (validPlay == false)
-        {
-            //Check if it's possible for the computer to win the game
-            for (let i = 0; i < winCons.length; i++)
-            {
-                if (playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][1]] == "O" && playerSelections[winCons[i][2]] == "O" || playerSelections[winCons[i][0]] == "O" && playerSelections[winCons[i][2]] == "O")
-                {
-                    for (let c = 0; c < winCons[i].length; c++)
-                    {
-                        if (playerSelections[winCons[i][c]] == "")
-                        {
-                            ranNum = winCons[i][c];
-                            break;
-                        }
-                    }
-                }
-                //Check if it's possible to block the player from winning the game
-                else if (playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][1]] == "X" && playerSelections[winCons[i][2]] == "X" || playerSelections[winCons[i][0]] == "X" && playerSelections[winCons[i][2]] == "X")
-                {
-
-                    for (let d = 0; d < winCons[i].length; d++)
-                    {
-                        if (playerSelections[winCons[i][d]] == "")
-                        {
-                            ranNum = winCons[i][d];
-                            break;
-                        }
-                    }
-                }
-                //Looks for rows already containing an O and randomly selects a square from one of those rows to attempt to make a line
-                /**
-                 * WHY IS THIS SO BROKEN?!?!?!?!?!?!?!?!?
-                 */
-                else
-                {
-                    if (playerSelections[winCons[i][0]] == "X" || playerSelections[winCons[i][1]] == "X" || playerSelections[winCons[i][2]] == "X")
-                    {
-                        console.log("I have checked " + winCons[i] + " and skipped")
-                        continue;
-                    }
-                    else if (playerSelections[winCons[i][0]] == "O" || playerSelections[winCons[i][1]] == "O" || playerSelections[winCons[i][2]] == "O")
-                    {
-                        if (playerSelections[winCons[i][0]] == "") {availableCells.push(winCons[i][0])}
-
-                        if (playerSelections[winCons[i][1]] == "") {availableCells.push(winCons[i][1])}
-
-                        if (playerSelections[winCons[i][2]] == "") {availableCells.push(winCons[i][2])}
-
-                        numHolder = Math.floor(Math.random() * (availableCells.length + 1));
-                        ranNum = availableCells[numHolder];
-
-                        console.log("I have checked " + winCons[i] + " and gotten " + availableCells + " and " + ranNum);
-                    }
-                    else if (availableCells.length == 0)
-                    {
-                        ranNum = Math.floor(Math.random() * 9);
-                    }
-                }   
-            }
-
-            //while (availableCells.length > 0) {availableCells.pop()}
-            //console.log(ranNum);
-
-            if (document.getElementById("b" + ranNum).innerHTML == "")
-            {
-                setTimeout(() => {if(currentPlayer == "O"){document.getElementById("b" + ranNum).innerHTML = "O"}}, 1000);
-                setTimeout(() => {enableButtons()}, 1000);
-                playerSelections[ranNum] = currentPlayer; 
-                gameStatus();
-                if (gameOver != true){
-                    setTimeout(() => {currentPlayer = "X"}, 1000);
-                }
-                validPlay = true;
-            }
-            else
-            {
-                continue;
-            }
-        }
-        //console.log(availableCells);
+        aiPlacement(difficulty);
     }
 }
 
 /**
- * THIS FUNCTION IS ONLY FOR RESTARTING THE GAME
- */
-
-/**
- * Runs when the player clicks play again
- * Foreach loop enables all the cells on the board, removes all the Xs and Os, resets the cell colours to their default
- * Removes error/victory/draw message from the screen if there is one, resets the player to X, resets the array containing player selections
- * Makes the game active again and removes the prompt to select play again if there is one
+ * Resets all necessary aspects of the game when the play again button is clicked
  */
 function playAgain() {
+    //disables all the buttons on the game board, resets their text and the colour of the cells
     gameCells.forEach(element => {
         element.disabled = true;
         element.innerHTML = "";
         element.style.backgroundColor=null;
     });
+    /**
+     * Resets message header, sets current player to X, resets playerSelection, sets gameOver to false, resets replay header
+     * Resets difficulty, displays each of the difficulty select buttons
+     */
     document.getElementById("messageHeader").innerHTML = "";
     currentPlayer = "X";
     playerSelections = ["", "", "", "", "", "", "", "", ""];
@@ -274,18 +92,18 @@ function playAgain() {
 }
 
 /**
- * ALL FUNCTIONS BELOW HERE ARE ONLY TO HELP THE GAME LOOP FUNCTION APPROPRIATELY
- */
-
-/**
- * Checks if a player has won the game and if one has a message is displayed declaring the victor, the winning cells are hilighted green and the game is made inactive
- * If the game ends in a tie a message stating so is displayed, the cells are hilighted orange to make a C for cats game and the game is made inactive
+ * Checks the status of the game (whether it has ended in a win for the player, a win for the computer or a cats game)
  */
 function gameStatus() {
     for(let i = 0; i < winCons.length; i++)
     {
+        //If all the cells in a line have the same character in them
         if(playerSelections[winCons[i][0]] == currentPlayer && playerSelections[winCons[i][1]] == currentPlayer && playerSelections[winCons[i][2]] == currentPlayer)
         {
+            /**
+             * If the characters are Os
+             * hilights the matching cells in green and declares O as the winner
+             */
             if (currentPlayer == "O") {
                 setTimeout(() => {document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`}, 1000);
                 setTimeout(() => {document.getElementById("b" + winCons[i][0]).style.backgroundColor="green"}, 1000);
@@ -293,6 +111,10 @@ function gameStatus() {
                 setTimeout(() => {document.getElementById("b" + winCons[i][2]).style.backgroundColor="green"}, 1000);
                 gameOver = true;
             }
+            /**
+             * If the characters are Os
+             * hilights the matching cells in green and declares X as the winner
+             */
             else if (currentPlayer == "X") {
                 document.getElementById("messageHeader").innerHTML = `Player ${currentPlayer} has won the game!`;
                 document.getElementById("b" + winCons[i][0]).style.backgroundColor="green";
@@ -303,6 +125,10 @@ function gameStatus() {
             }
             
         }
+        /**
+         * If there are no empty cells on the board and no win has been found (cats game)
+         * hilights cells orange in the shape of a C and declares a cats game
+         */
         else if(!playerSelections.includes("") && gameOver == false && i == winCons.length - 1)
         {
             document.getElementById("messageHeader").innerHTML = "The game has ended in a draw. Would you like to play again?";
@@ -319,22 +145,137 @@ function gameStatus() {
     }
 }
 
+/**
+ * Disables each of the buttons on the board
+ */
 function disableButtons() {
     gameCells.forEach(element => {
         element.disabled = true;
     });
 }
 
+/**
+ * Enables each of the buttons on the board
+ */
 function enableButtons() {
     gameCells.forEach(element => {
         element.disabled = false;
     });
 }
 
+/**
+ * 
+ * @param {*} id The ID of the button being clicked
+ * Sets the difficulty to the id passed to the function
+ * Hides each of the difficulty buttons
+ * Enables each of the buttons on the board
+ */
 function difficultySelect(id) {
     difficulty = id;
     document.getElementById("easy").style.display = "none";
     document.getElementById("normal").style.display = "none";
     document.getElementById("hard").style.display = "none";
     enableButtons();
+}
+
+/**
+ * 
+ * @param {*} array The array being searched for a specific value
+ * @param {*} value The value being searched for in the array
+ * @returns An array of the values searched for and pulled from the array passed to the function
+ */
+function getAllIndices(array, value) {
+    let indices = [];
+
+    for (i = 0; i < array.length; i++)
+    {
+        if (array[i] == value)
+        {
+            indices.push(i);
+        }
+    }
+
+    return indices;
+}
+
+/**
+ * 
+ * @param {*} difficulty The difficulty chosen by the player
+ */
+function aiPlacement(difficulty) {
+    let aiPlacement;                                //The cell the ai will place on
+    aiPlays = ["", "", "", "", "", "", "", "", ""]; //Used by checkArray to get the indexes the ai will play on
+    let checkArray = [];                            //Viable cells for the ai to place on
+    let matchCheck = "";                            //Used to check for matching characters
+
+    //If index of playerSelection is not empty, places an N into the aiPlays array
+    for (i = 0; i < playerSelections.length; i++) {
+        if (playerSelections[i] != "") aiPlays[i] = "N";
+    }
+
+    //If player chose normal or hard as the difficulty
+    if (difficulty == "normal" || difficulty == "hard") {
+        //concatonates the characters in the playerSelection array corresponding to each of the indexes in the current winCons array
+        for (i = 0; i < winCons.length; i++) {
+            matchCheck = playerSelections[winCons[i][0]] + playerSelections[winCons[i][1]] + playerSelections[winCons[i][2]]
+
+            if (matchCheck == "OO") {
+                //Places OO into the index of playerSelection that matches with the index from above that contained a blank string
+                for (j = 0; j < winCons[i].length; j++) {
+                    if (playerSelections[winCons[i][j]] == "") aiPlays[winCons[i][j]] = "OO";
+                }
+            }
+            else if (matchCheck == "XX") {
+                //Places XX into the index of playerSelection that matches with the index from above that contained a blank string
+                for (k = 0; k < winCons[i].length; k++) {
+                    if (playerSelections[winCons[i][k]] == "") aiPlays[winCons[i][k]] = "XX";
+                }
+            }
+
+            //If player chose hard as the difficulty
+            if(difficulty == "hard") {
+                if (matchCheck == "O") {
+                    ////Places O into the indexes of playerSelection that match with the indexes from above that contained blank strings
+                    for (l = 0; l < winCons.length; l++) {
+                        if (playerSelections[winCons[i][l]] == "") aiPlays[winCons[i][l]] = "O";
+                    }
+                }
+            }
+        }
+    }
+
+    if (aiPlays.includes("OO") == true) {
+        //Places the index numbers of aiPlays that contain an OO into checkArray
+        checkArray = getAllIndices(aiPlays, "OO");
+    }
+    else if (aiPlays.includes("XX") == true) {
+        //Places the index numbers of aiPlays that contain an XX into checkArray
+        checkArray = getAllIndices(aiPlays, "XX");
+    }
+    else if (aiPlays.includes("O") == true) {
+        //Places the index numbers of aiPlays that contain an O into checkArray
+        checkArray = getAllIndices(aiPlays, "O");
+    }
+    else {
+        //Places the index numbers of aiPlays that contain a blank string into checkArray
+        checkArray = getAllIndices(aiPlays, "");
+    }
+
+    //Randomly generates a number between 0 and the length of checkArray
+    ranNum = Math.floor(Math.random() * checkArray.length);
+    //Assigns the value contained at the index of whatever ranNum is to aiPlacement
+    aiPlacement = checkArray[ranNum];
+
+    /**
+     * Places an O into the cell number contained within aiPlacement after a 1 second delay
+     * Enables all the buttons on the board after a 1 second delay
+     * Assigns an O to the index of playerSelections that matches whatever number is contained in aiPlacement
+     * Checks the status of the game (whether a player has won or the game has ended in a cats game)
+     * If the game has not ended he currentPlayer is set to X after a 1 second delay
+     */
+    setTimeout(() => {document.getElementById("b" + aiPlacement).innerHTML = "O"}, 1000);
+    setTimeout(() => {enableButtons()}, 1000);
+    playerSelections[aiPlacement] = currentPlayer; 
+    gameStatus();
+    if (gameOver != true) setTimeout(() => {currentPlayer = "X"}, 1000);
 }
